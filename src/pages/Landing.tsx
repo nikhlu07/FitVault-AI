@@ -18,8 +18,7 @@ export default function Landing() {
           </span>
         </div>
         <div className="flex gap-6 items-center">
-          <a href="#features" className="text-sm font-medium hover:text-tether-500 transition-colors">Features</a>
-          <a href="#about" className="text-sm font-medium hover:text-tether-500 transition-colors">How it works</a>
+          <a href="#features" className="text-sm font-medium hover:text-tether-500 transition-colors">How it works</a>
           <button onClick={() => navigate('/dashboard')} className="px-5 py-2.5 rounded-full bg-tether-600 hover:bg-tether-500 hover:shadow-[0_0_20px_rgba(234,88,12,0.4)] text-white text-sm font-medium transition-all duration-300">
             Launch App
           </button>
