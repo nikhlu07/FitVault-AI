@@ -392,24 +392,6 @@ gantt
 
 ---
 
-## Getting Started
-
-Full setup documentation is available in the `/docs` directory. At a minimum, you will need Node.js 18+, a configured Tether WDK environment, and access to a health data oracle endpoint.
-
-Refer to `docs/quickstart.md` for a step-by-step walkthrough of initializing your first vault on testnet, and `docs/agent-configuration.md` for a complete reference on Sweat Goal parameters and agent logic settings.
-
-```
-docs/
-├── quickstart.md              # First vault on testnet
-├── agent-configuration.md     # Sweat Goal & agent logic reference
-├── wdk-integration.md         # Tether WDK setup & wallet management
-├── oracle-setup.md            # Health data oracle configuration
-├── security.md                # Key management & HSM guide
-└── architecture.md            # Deep-dive system design
-```
-
----
-
 ## Contributing
 
 Contributions are welcome. Please read `CONTRIBUTING.md` before opening a pull request. All submissions must include tests and adhere to the existing code style. Security-relevant issues should be reported privately via the disclosure process described in `SECURITY.md`.
