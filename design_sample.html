@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitVault-AI | Clinical Athletics</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Color Architecture */
+        :root {
+            --absolute-white: #FFFFFF;
+            --optical-ash: #F4F4F5;
+            --vantablack: #000000;
+            --graphite: #8E8E93;
+            --infrared: #FF3300;
+            --aave-purple: #B6509E;
+            --penalty-crimson: #D90429;
+            --success-gold: #FFD700;
+
+            --font-display: 'Oswald', sans-serif;
+            --font-ui: 'Inter', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+
+        /* Base Resets */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--absolute-white);
+            color: var(--vantablack);
+            font-family: var(--font-ui);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        .text-display {
+            font-family: var(--font-display);
+            font-size: clamp(4rem, 12vw, 12rem);
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        .text-mono {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--graphite);
+        }
+
+        .text-body {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Layout & Grid */
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            min-height: 100vh;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--vantablack);
+        }
+
+        .agent-badge {
+            border: 1px solid var(--vantablack);
+            padding: 4px 12px;
+            border-radius: 999px;
+            color: var(--vantablack);
+            font-weight: 600;
+        }
+
+        .hero {
+            grid-column: 1 / -1;
+            padding: 4rem 0 2rem 0;
+        }
+
+        .control-panel {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Vault Construction Card */
+        .vault-card {
+            grid-column: 1 / 7;
+            border: 1px solid var(--vantablack);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            position: relative;
+        }
+
+        /* Microscopic Crosshairs */
+        .vault-card::before,
+        .vault-card::after {
+            content: '+';
+            position: absolute;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--vantablack);
+        }
+
+        .vault-card::before {
+            top: -6px;
+            left: -3px;
+        }
+
+        .vault-card::after {
+            bottom: -6px;
+            right: -3px;
+        }
+
+        .vault-quadrant {
+            padding: 1.5rem;
+            outline: 1px solid var(--vantablack);
+            /* Sharp 1px interior grid */
+        }
+
+        .vault-quadrant.full-width {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--vantablack);
+            animation: flash 1s step-end infinite;
+        }
+
+        @keyframes flash {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        /* The Linear Pacer */
+        .pacer-wrapper {
+            grid-column: 7 / -1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .pacer-container {
+            width: 100%;
+            height: 48px;
+            background-color: var(--optical-ash);
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .pacer-fill {
+            height: 100%;
+            width: 68%;
+            /* Simulating progress */
+            background-color: var(--vantablack);
+        }
+
+        .pacer-playhead {
+            position: absolute;
+            top: -12px;
+            bottom: -12px;
+            width: 2px;
+            background-color: var(--infrared);
+            left: 68%;
+        }
+
+        /* Action Buttons */
+        .btn-primary {
+            background-color: var(--infrared);
+            color: var(--vantablack);
+            font-family: var(--font-ui);
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 1.5rem 3rem;
+            border: none;
+            cursor: pointer;
+            transition: box-shadow 0s;
+            font-size: 1.2rem;
+            margin-top: 2rem;
+        }
+
+        .btn-primary:hover {
+            /* Sonar Ping effect simulating 2px expanding border */
+            box-shadow: 0 0 0 2px var(--absolute-white), 0 0 0 4px var(--vantablack);
+        }
+
+        .btn-secondary {
+            background: none;
+            border: none;
+            color: var(--vantablack);
+            font-family: var(--font-ui);
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            padding-bottom: 2px;
+        }
+
+        .btn-secondary::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--vantablack);
+            transition: height 0.1s cubic-bezier(0, 0, 0, 1);
+            z-index: -1;
+        }
+
+        .btn-secondary:hover::after {
+            height: 100%;
+        }
+
+        .btn-secondary:hover {
+            color: var(--absolute-white);
+        }
+
+        /* Audit Log Drawer */
+        .audit-log {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--vantablack);
+            color: var(--absolute-white);
+            padding: 1rem 2rem;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            border-top: 1px solid var(--graphite);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .accent-aave {
+            color: var(--aave-purple);
+        }
+
+        /* Scramble Animation Class (for JS trigger) */
+        .scramble {
+            font-family: var(--font-mono);
+            letter-spacing: 0.2em;
+        }
+
+        @media (max-width: 1024px) {
+
+            .vault-card,
+            .pacer-wrapper {
+                grid-column: 1 / -1;
+            }
+
+            .pacer-wrapper {
+                margin-top: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <div class="text-mono" style="color: var(--vantablack); font-weight: 600;">FITVAULT-AI // 0xPROTO</div>
+            <div class="text-mono agent-badge">[AGENT: AUTONOMOUS]</div>
+        </header>
+
+        <div class="hero">
+            <div class="text-mono">NORMALIZED ACTIVITY SCORE</div>
+            <div class="text-display scramble">10,482</div>
+            <div class="text-body" style="max-width: 400px; margin-top: 1rem;">
+                Protocol engaged. Sweat goal tracking is active. Failure to meet threshold results in 5% principal
+                forfeiture.
+            </div>
+            <button class="btn-primary">Stake USD₮</button>
+        </div>
+
+        <div class="control-panel">
+
+            <div class="vault-card">
+                <div class="vault-quadrant text-mono">
+                    <span style="color: var(--vantablack);">SWEAT GOAL</span><br>
+                    30-DAY / 10K STEPS
+                </div>
+                <div class="vault-quadrant text-mono" style="text-align: right;">
+                    <span style="color: var(--vantablack);">ORACLE STATUS</span><br>
+                    SYNCED <span class="status-dot"></span>
+                </div>
+                <div class="vault-quadrant full-width">
+                    <div>
+                        <div class="text-mono">STAKED PRINCIPAL</div>
+                        <div style="font-size: 2rem; font-weight: 700; line-height: 1;">$2,500.00 USD₮</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="text-mono">CURRENT APY</div>
+                        <div class="text-mono accent-aave">AAVE V3 / 4.2%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pacer-wrapper">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <div class="text-mono" style="color: var(--vantablack);">COMMITMENT WINDOW</div>
+                    <div class="text-mono">DAY 21 / 30</div>
+                </div>
+                <div class="pacer-container">
+                    <div class="pacer-fill"></div>
+                    <div class="pacer-playhead"></div>
+                </div>
+                <div style="margin-top: 1.5rem; text-align: right;">
+                    <button class="btn-secondary">Compounding Election &rarr;</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="audit-log">
+        <div>> OPENCLAW AGENT EXECUTING // NORMALIZER_SYNC // HASH: 0x8F9B...4A21</div>
+        <div>TETHER WDK: ACTIVE</div>
+    </div>
+
+    <script>
+        // Optional: Simple algorithmic text haptic for the loading scramble effect
+        const scrambleElement = document.querySelector('.scramble');
+        const targetValue = scrambleElement.innerText;
+        const chars = '0123456789X!#$';
+        let iterations = 0;
+
+        const interval = setInterval(() => {
+            scrambleElement.innerText = targetValue.split('').map((letter, index) => {
+                if (index < iterations) return targetValue[index];
+                return chars[Math.floor(Math.random() * chars.length)];
+            }).join('');
+
+            if (iterations >= targetValue.length) clearInterval(interval);
+            iterations += 1 / 3; // Speed of snap
+        }, 30);
+    </script>
+</body>
+
+</html>
