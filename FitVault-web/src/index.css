@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --absolute-white: 0 0% 100%;
+    --optical-ash: 240 5% 96%;
+    --vantablack: 0 0% 0%;
+    --graphite: 240 3% 42%;
+    --infrared: 12 100% 50%;
+    --aave-purple: 315 38% 51%;
+    --penalty-crimson: 349 97% 43%;
+    --success-gold: 51 100% 50%;
+
+    --background: var(--absolute-white);
+    --foreground: var(--vantablack);
+    --primary: var(--infrared);
+    --primary-foreground: var(--vantablack);
+    --secondary: var(--optical-ash);
+    --secondary-foreground: var(--vantablack);
+    --muted: var(--optical-ash);
+    --muted-foreground: var(--graphite);
+    --accent: var(--aave-purple);
+    --accent-foreground: var(--absolute-white);
+    --destructive: var(--penalty-crimson);
+    --destructive-foreground: var(--absolute-white);
+    --border: var(--vantablack);
+    --input: var(--vantablack);
+    --ring: var(--vantablack);
+    --card: var(--absolute-white);
+    --card-foreground: var(--vantablack);
+    --popover: var(--absolute-white);
+    --popover-foreground: var(--vantablack);
+    --radius: 0px;
+
+    --font-display: 'Oswald', sans-serif;
+    --font-ui: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    border-radius: 0 !important;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-ui);
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-ui {
+    font-family: var(--font-ui);
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Sonar ping animation for deploy button */
+@keyframes sonar-ping {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--infrared) / 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 8px hsl(var(--infrared) / 0);
+  }
+}
+
+/* Oracle flash */
+@keyframes oracle-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.animate-oracle-flash {
+  animation: oracle-flash 1.2s ease-in-out infinite;
+}
+
+/* Crosshair corner marks */
+.crosshair-tl::before,
+.crosshair-br::after {
+  content: '+';
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: hsl(var(--vantablack));
+  line-height: 1;
+}
+.crosshair-tl::before {
+  top: -14px;
+  left: -6px;
+}
+.crosshair-br::after {
+  bottom: -14px;
+  right: -6px;
+}
