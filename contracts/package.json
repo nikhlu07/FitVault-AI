@@ -1,0 +1,20 @@
+{
+  "name": "fitvault-contracts",
+  "version": "1.0.0",
+  "description": "FitVault-AI smart contracts",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:amoy": "hardhat run scripts/deploy.js --network polygonAmoy",
+    "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
+    "node": "hardhat node"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "hh2",
+    "@openzeppelin/contracts": "^5.6.1",
+    "dotenv": "^17.4.1",
+    "hardhat": "^2.28.6"
+  }
+}
