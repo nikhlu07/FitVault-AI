@@ -85,9 +85,9 @@ const Index = () => {
                 <a href="#how-it-works" className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground hover:text-infrared transition-colors pb-1 border-b border-foreground/30 hover:border-infrared">
                   VIEW ARCHITECTURE
                 </a>
-                <a href="/pitch_deck.md" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground hover:text-infrared transition-colors pb-1 border-b border-foreground/30 hover:border-infrared flex items-center gap-1">
+                <Link to="/pitch-deck" className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground hover:text-infrared transition-colors pb-1 border-b border-foreground/30 hover:border-infrared flex items-center gap-1">
                   VIEW PITCH DECK <span className="text-infrared">↗</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

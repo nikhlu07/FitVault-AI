@@ -7,6 +7,7 @@ import CreateVault from "./pages/CreateVault.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Audit from "./pages/Audit.tsx";
 import Settlement from "./pages/Settlement.tsx";
+import PitchDeck from "./pages/PitchDeck.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const App = () => (
@@ -20,6 +21,7 @@ const App = () => (
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/audit" element={<Audit />} />
         <Route path="/settlement" element={<Settlement />} />
+        <Route path="/pitch-deck" element={<PitchDeck />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

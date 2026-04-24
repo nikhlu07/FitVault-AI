@@ -22,6 +22,9 @@ const Header = () => {
           <Link to="/settlement" className="font-mono text-[10px] uppercase tracking-[0.1em] text-graphite hover:text-white transition-colors">
             Settle
           </Link>
+          <Link to="/pitch-deck" className="font-mono text-[10px] uppercase tracking-[0.1em] text-infrared hover:text-white transition-colors flex items-center gap-1">
+            Pitch Deck <span className="text-[8px]">↗</span>
+          </Link>
         </nav>
         <WalletButton />
       </div>
