@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import Header from "@/components/Header";
 import { useScramble } from "@/hooks/useScramble";
+import { useVault, type GoalType } from "@/hooks/useVault";
+import { saveVault } from "@/lib/vaultStore";
 
 const DURATION_OPTIONS = [
   { label: "7 DAYS", value: 7, risk: "LOW" },
@@ -10,13 +13,24 @@ const DURATION_OPTIONS = [
   { label: "90 DAYS", value: 90, risk: "EXTREME" },
 ];
 
+const STEP_LABELS: Record<string, string> = {
+  idle: "STAKE & DEPLOY ->",
+  approving: "APPROVING USD₮...",
+  deploying: "DEPLOYING VAULT...",
+  done: "VAULT DEPLOYED ✓",
+  error: "RETRY DEPLOY ->",
+};
+
 const CreateVault = () => {
   const navigate = useNavigate();
-  const [goalType, setGoalType] = useState("steps");
+  const { openConnectModal } = useConnectModal();
+  const { deploy, step, errorMsg, reset, isConnected, address } = useVault();
+
+  const [goalType, setGoalType] = useState<GoalType>("steps");
   const [goalValue, setGoalValue] = useState("10000");
   const [stakeAmount, setStakeAmount] = useState("2500");
   const [duration, setDuration] = useState(30);
-  const [deploying, setDeploying] = useState(false);
+  const [compounding, setCompounding] = useState(false);
   const [scrambleTrigger, setScrambleTrigger] = useState(0);
 
   const stake = parseFloat(stakeAmount || "0");
@@ -24,19 +38,46 @@ const CreateVault = () => {
   const forfeitProtocol = (stake * 0.05).toFixed(2);
   const forfeitCommunity = (stake * 0.95).toFixed(2);
 
+  const isDeploying = step === "approving" || step === "deploying";
+  const isDone = step === "done";
+
   const buttonLabel = useScramble(
-    deploying ? "DEPLOYING..." : "STAKE & DEPLOY ->",
-    1500,
+    STEP_LABELS[step] ?? "STAKE & DEPLOY ->",
+    1200,
     scrambleTrigger
   );
 
-  const handleDeploy = () => {
-    setDeploying(true);
-    setScrambleTrigger((p) => p + 1);
-    setTimeout(() => navigate("/dashboard"), 1500);
-  };
-
   const selectedDuration = DURATION_OPTIONS.find((d) => d.value === duration);
+
+  const handleDeploy = async () => {
+    if (!isConnected) {
+      openConnectModal?.();
+      return;
+    }
+    if (step === "error") reset();
+
+    setScrambleTrigger((p) => p + 1);
+
+    const success = await deploy({ stakeAmount, goalType, goalValue, duration, compounding });
+
+    if (success && address) {
+      // Persist vault locally so dashboard can read it
+      saveVault({
+        id: `0x${Math.random().toString(16).slice(2, 10).toUpperCase()}...${Math.random().toString(16).slice(2, 6).toUpperCase()}`,
+        owner: address,
+        stakeAmount,
+        goalType,
+        goalValue,
+        duration,
+        compounding,
+        startDate: new Date().toISOString().split("T")[0],
+        status: "active",
+        currentDay: 1,
+        accruedYield: 0,
+      });
+      setTimeout(() => navigate("/dashboard"), 800);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -63,6 +104,24 @@ const CreateVault = () => {
               All terms are cryptographically enforced and immutable post-deployment.
             </p>
 
+            {/* Wallet status */}
+            <div className={`border p-4 mb-4 ${isConnected ? "border-success-gold/40" : "border-infrared/40"}`}>
+              <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-graphite mb-2">
+                // WALLET STATUS
+              </p>
+              {isConnected ? (
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-success-gold rounded-full inline-block" />
+                  <span className="font-mono text-[10px] text-success-gold uppercase">CONNECTED</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-infrared rounded-full animate-pulse inline-block" />
+                  <span className="font-mono text-[10px] text-infrared uppercase">NOT CONNECTED</span>
+                </div>
+              )}
+            </div>
+
             {/* Protocol info */}
             <div className="border border-foreground p-4 space-y-3">
               <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-graphite">
@@ -72,8 +131,8 @@ const CreateVault = () => {
                 { k: "YIELD ENGINE", v: "AAVE V3" },
                 { k: "SETTLEMENT", v: "TETHER WDK" },
                 { k: "ORACLE", v: "OPENCLAW AGENT" },
-                { k: "NETWORK", v: "ETHEREUM L1" },
-                { k: "GAS ESTIMATE", v: "~0.004 ETH" },
+                { k: "NETWORK", v: "POLYGON" },
+                { k: "GAS ESTIMATE", v: "~0.004 MATIC" },
               ].map((p) => (
                 <div key={p.k} className="flex justify-between">
                   <span className="font-mono text-[9px] text-graphite">{p.k}</span>
@@ -90,16 +149,15 @@ const CreateVault = () => {
               <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-infrared mb-6">
                 // STEP 01 — DEFINE SWEAT GOAL
               </p>
-
               <div className="mb-8">
                 <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-graphite block mb-3">
                   METRIC TYPE
                 </label>
                 <div className="grid grid-cols-3 gap-0 border border-foreground">
                   {[
-                    { value: "steps", label: "DAILY STEPS", icon: "//" },
-                    { value: "active-minutes", label: "ACTIVE MIN", icon: "→" },
-                    { value: "heart-rate", label: "HR ZONE", icon: "♥" },
+                    { value: "steps" as GoalType, label: "DAILY STEPS", icon: "//" },
+                    { value: "active-minutes" as GoalType, label: "ACTIVE MIN", icon: "→" },
+                    { value: "heart-rate" as GoalType, label: "HR ZONE", icon: "♥" },
                   ].map((opt) => (
                     <button
                       key={opt.value}
@@ -116,7 +174,6 @@ const CreateVault = () => {
                   ))}
                 </div>
               </div>
-
               <div>
                 <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-graphite block mb-2">
                   TARGET VALUE
@@ -153,9 +210,7 @@ const CreateVault = () => {
                     }`}
                   >
                     <span className="font-display text-lg md:text-xl font-bold block">{opt.label}</span>
-                    <span className={`font-mono text-[9px] block mt-1 ${
-                      duration === opt.value ? "text-graphite" : "text-graphite"
-                    }`}>
+                    <span className="font-mono text-[9px] block mt-1 text-graphite">
                       RISK: {opt.risk}
                     </span>
                   </button>
@@ -168,7 +223,6 @@ const CreateVault = () => {
               <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-infrared mb-6">
                 // STEP 03 — STAKE CONFIGURATION
               </p>
-
               <div className="mb-8">
                 <label className="font-mono text-[10px] uppercase tracking-[0.15em] text-graphite block mb-2">
                   USD₮ AMOUNT
@@ -196,6 +250,34 @@ const CreateVault = () => {
                       ${parseInt(amt).toLocaleString()}
                     </button>
                   ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Step 4: Compounding election */}
+            <section className="mb-14">
+              <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-infrared mb-6">
+                // STEP 04 — COMPOUNDING ELECTION (OPTIONAL)
+              </p>
+              <div
+                onClick={() => setCompounding((c) => !c)}
+                className={`border p-5 cursor-pointer transition-colors flex items-start gap-4 ${
+                  compounding ? "border-aave-purple bg-aave-purple/5" : "border-foreground hover:bg-optical-ash"
+                }`}
+              >
+                <div className={`w-4 h-4 border mt-0.5 flex-shrink-0 flex items-center justify-center transition-colors ${
+                  compounding ? "border-aave-purple bg-aave-purple" : "border-foreground"
+                }`}>
+                  {compounding && <span className="text-background text-[10px] font-bold">✓</span>}
+                </div>
+                <div>
+                  <p className="font-mono text-[11px] uppercase font-semibold mb-1">
+                    ELECT XAU₮ COMPOUNDING
+                  </p>
+                  <p className="font-ui text-xs text-graphite leading-relaxed">
+                    On success, accrued USD₮ yield will be swapped to XAU₮ (Tether Gold) via Paraswap V6
+                    and deposited into your Success Vault for long-term wealth preservation.
+                  </p>
                 </div>
               </div>
             </section>
@@ -258,18 +340,58 @@ const CreateVault = () => {
                     { k: "TARGET", v: parseInt(goalValue || "0").toLocaleString() },
                     { k: "DURATION", v: `${duration} DAYS` },
                     { k: "RISK LEVEL", v: selectedDuration?.risk || "—" },
-                    { k: "STAKE", v: `$${stake.toLocaleString()} USD₮` },
-                    { k: "EST. YIELD", v: `+$${estimatedYield} USD₮` },
+                    { k: "STAKE", v: `${stake.toLocaleString()} USD₮` },
+                    { k: "EST. YIELD", v: `+${estimatedYield} USD₮` },
+                    { k: "COMPOUNDING", v: compounding ? "XAU₮ VIA PARASWAP" : "DISABLED" },
                     { k: "ENFORCEMENT", v: "AUTONOMOUS — OPENCLAW AGENT" },
                   ].map((row) => (
                     <div key={row.k} className="flex justify-between py-1.5 border-b border-foreground/10">
                       <span className="font-mono text-[10px] text-graphite">{row.k}</span>
-                      <span className="font-mono text-[10px] font-semibold">{row.v}</span>
+                      <span className={`font-mono text-[10px] font-semibold ${row.k === "COMPOUNDING" && compounding ? "text-aave-purple" : ""}`}>
+                        {row.v}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
             </section>
+
+            {/* Error message */}
+            {errorMsg && (
+              <div className="border border-penalty-crimson p-4 mb-6">
+                <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-penalty-crimson">
+                  // ERROR: {errorMsg}
+                </p>
+              </div>
+            )}
+
+            {/* Transaction status */}
+            {isDeploying && (
+              <div className="border border-foreground/30 p-4 mb-6 bg-optical-ash">
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-infrared rounded-full animate-ping inline-block" />
+                  <p className="font-mono text-[10px] uppercase tracking-[0.1em]">
+                    {step === "approving" ? "AWAITING USD₮ APPROVAL IN WALLET..." : "DEPLOYING VAULT CONTRACT..."}
+                  </p>
+                </div>
+                <p className="font-mono text-[9px] text-graphite mt-2">
+                  {step === "approving"
+                    ? "STEP 1/2 — APPROVE USDT SPEND IN YOUR WALLET"
+                    : "STEP 2/2 — CONFIRM VAULT CREATION TRANSACTION"}
+                </p>
+              </div>
+            )}
+
+            {isDone && (
+              <div className="border border-success-gold p-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="w-2 h-2 bg-success-gold rounded-full inline-block" />
+                  <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-success-gold">
+                    VAULT DEPLOYED — REDIRECTING TO DASHBOARD...
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Disclaimer */}
             <div className="border-t border-foreground pt-6 mb-8">
@@ -280,19 +402,18 @@ const CreateVault = () => {
               </p>
             </div>
 
-            {/* Deploy */}
+            {/* Deploy button */}
             <button
               onClick={handleDeploy}
-              disabled={deploying}
+              disabled={isDeploying || isDone}
               className="bg-infrared px-8 py-5 font-display text-base uppercase tracking-[0.15em] font-bold text-foreground transition-all hover:shadow-[0_0_0_2px_hsl(var(--absolute-white)),0_0_0_4px_hsl(var(--vantablack))] disabled:opacity-70 w-full"
             >
-              {buttonLabel}
+              {!isConnected ? "CONNECT WALLET TO DEPLOY" : buttonLabel}
             </button>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-foreground py-4 px-6 mt-16">
         <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-graphite">
           © 2026 FITVAULT-AI // VAULT CONFIGURATION IS FINAL // PROTOCOL V0.1.0

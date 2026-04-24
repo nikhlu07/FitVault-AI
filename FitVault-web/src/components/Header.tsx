@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import WalletButton from "@/components/WalletButton";
 
 const Header = () => {
   return (
@@ -18,12 +19,11 @@ const Header = () => {
           <Link to="/audit" className="font-mono text-[10px] uppercase tracking-[0.1em] text-graphite hover:text-white transition-colors">
             Audit
           </Link>
+          <Link to="/settlement" className="font-mono text-[10px] uppercase tracking-[0.1em] text-graphite hover:text-white transition-colors">
+            Settle
+          </Link>
         </nav>
-        <div className="border border-white/20 px-3 py-1 backdrop-blur-sm bg-white/5" style={{ borderRadius: '999px' }}>
-          <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-white/90 font-medium">
-            [AGENT: AUTONOMOUS]
-          </span>
-        </div>
+        <WalletButton />
       </div>
     </header>
   );

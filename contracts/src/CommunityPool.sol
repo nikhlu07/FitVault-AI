@@ -59,7 +59,6 @@ contract CommunityPool is Ownable, ReentrancyGuard {
         totalReceived += amount;
         emit ForfeitReceived(currentEpoch, amount);
     }
-
     /**
      * @notice Distribute current epoch's balance to winners.
      * @param winners  Array of winner addresses.

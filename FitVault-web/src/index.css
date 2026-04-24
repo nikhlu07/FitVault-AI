@@ -102,6 +102,43 @@
   animation: oracle-flash 1.2s ease-in-out infinite;
 }
 
+/* Settlement flash — infrared full-screen frame */
+@keyframes infrared-flash {
+  0%   { opacity: 1; }
+  8%   { opacity: 0; }
+  100% { opacity: 0; }
+}
+.animate-infrared-flash {
+  animation: infrared-flash 0.35s ease-out forwards;
+}
+
+/* Strikethrough wipe */
+@keyframes strike-wipe {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+.animate-strike {
+  animation: strike-wipe 0.4s ease-in forwards;
+}
+
+/* Ticker scroll */
+@keyframes ticker-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-ticker-in {
+  animation: ticker-in 0.25s ease-out forwards;
+}
+
+/* Success reveal */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-reveal-up {
+  animation: reveal-up 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
 /* Crosshair corner marks */
 .crosshair-tl::before,
 .crosshair-br::after {

@@ -79,11 +79,16 @@ const Index = () => {
             <p className="font-ui text-lg font-medium text-graphite leading-relaxed mb-10 max-w-[480px]">
               Lock capital into non-custodial smart contracts. Prove your biometric output via strictly enforced oracle data. Achieve your goals to earn Aave V3 yield, or forfeit 5% to the network on failure.
             </p>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8">
               <DeployButton label="INITIALIZE VAULT ->" to="/create-vault" />
-              <a href="#how-it-works" className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground hover:text-infrared transition-colors pb-1 border-b border-foreground/30 hover:border-infrared">
-                VIEW ARCHITECTURE
-              </a>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                <a href="#how-it-works" className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground hover:text-infrared transition-colors pb-1 border-b border-foreground/30 hover:border-infrared">
+                  VIEW ARCHITECTURE
+                </a>
+                <a href="/pitch_deck.md" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground hover:text-infrared transition-colors pb-1 border-b border-foreground/30 hover:border-infrared flex items-center gap-1">
+                  VIEW PITCH DECK <span className="text-infrared">↗</span>
+                </a>
+              </div>
             </div>
           </div>
 
